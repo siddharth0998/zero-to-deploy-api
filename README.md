@@ -315,9 +315,27 @@ ghcr.io/siddharth0998/zero-to-deploy-api:latest
 
 4. Set `ENV=production`.
 5. Set health check path to `/health`.
-6. Deploy manually after each successful CI image push, unless you add a Render deploy hook to the workflow.
+6. Add the Render deploy hook URL to GitHub Actions as `RENDER_DEPLOY_HOOK_URL`.
+7. Push to `main`; GitHub Actions will build, push, and trigger Render automatically.
 
-Important tradeoff: Render services that pull a prebuilt registry image are often less automatic than Render services linked directly to a Git branch. If you use GHCR image deploys, document whether deploys are manual, deploy-hook based, or Render-managed.
+This repository uses the deploy-hook approach for image-backed Render services. After the image is pushed to GHCR, GitHub Actions calls the Render deploy hook with the exact commit-SHA image tag. That keeps production tied to an immutable build instead of relying only on the moving `latest` tag.
+
+To configure the secret:
+
+1. In Render, open `siddharth-todo-api`.
+2. Go to **Settings**.
+3. Copy the **Deploy Hook URL**.
+4. In GitHub, open the repository settings.
+5. Go to **Secrets and variables** > **Actions**.
+6. Add a repository secret named:
+
+```text
+RENDER_DEPLOY_HOOK_URL
+```
+
+7. Paste the Render deploy hook URL as the secret value.
+
+Do not commit the deploy hook URL to the repository. Treat it like a secret because anyone with the URL can trigger a deploy.
 
 ## External Uptime Monitor
 
@@ -413,20 +431,6 @@ curl -i "$LIVE_API_URL/health"
 curl -i "$LIVE_API_URL/data"
 ```
 
-## Walkthrough Video Script
-
-Record a short video showing the complete operational loop:
-
-1. Show the live `/health` endpoint returning healthy.
-2. Make a small code change, such as changing the root message or health version.
-3. Run `ruff check .` and `pytest -q` locally.
-4. Commit and push to `main`.
-5. Open GitHub Actions and show the CI pipeline running.
-6. Show the Docker image pushed to GHCR.
-7. Show Render receiving the deploy and finishing successfully.
-8. Refresh `/health` and show the new version or response.
-9. Open the external uptime monitor and show the latest successful check.
-
 ## Cost Estimate at 100x Traffic
 
 Current traffic is assumed to be small prototype traffic.
@@ -473,10 +477,9 @@ The service now covers the core case deliverables, but these items should be com
 1. Confirm the Render health check path is set to `/health`.
 2. Add the external uptime monitor link or screenshot for evidence.
 3. Record the walkthrough video.
-4. Confirm whether Render deploys from the GitHub repo Dockerfile or from the GHCR image, then keep the README wording aligned with that choice.
-5. If using GHCR image deploys, add a Render deploy hook to the GitHub Actions workflow for full automatic deploys.
-6. Consider stronger structured logging with request IDs and real JSON serialization.
-7. Consider versioning from Git SHA or release tag instead of the hardcoded `1.0.0`.
+4. Add the `RENDER_DEPLOY_HOOK_URL` GitHub Actions secret if it is not already configured.
+5. Consider stronger structured logging with request IDs and real JSON serialization.
+6. Consider versioning from Git SHA or release tag instead of the hardcoded `1.0.0`.
 
 ## References
 

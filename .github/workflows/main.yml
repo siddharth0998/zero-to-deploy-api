@@ -46,6 +46,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
+        id: docker-build
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -55,3 +56,23 @@ jobs:
             ghcr.io/${{ github.repository }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Trigger Render deploy
+        if: github.event_name == 'push'
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          IMAGE_URL: ghcr.io/${{ github.repository }}:${{ github.sha }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "RENDER_DEPLOY_HOOK_URL secret is not configured."
+            exit 1
+          fi
+
+          encoded_image_url="$(python -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["IMAGE_URL"], safe=""))')"
+
+          separator="?"
+          case "$RENDER_DEPLOY_HOOK_URL" in
+            *\?*) separator="&" ;;
+          esac
+
+          curl -fsS -X POST "${RENDER_DEPLOY_HOOK_URL}${separator}imgURL=${encoded_image_url}"

@@ -185,10 +185,14 @@ Expected deployment behavior if Render is connected to the GitHub repo:
 Expected deployment behavior if Render pulls from GHCR:
 
 1. GitHub Actions pushes the image.
-2. A manual deploy or deploy hook tells Render to pull the new image.
-3. Render starts the new container.
-4. Render checks `/health`.
-5. Render shifts traffic after the new instance is healthy.
+2. GitHub Actions calls the Render deploy hook stored in `RENDER_DEPLOY_HOOK_URL`.
+3. The deploy hook includes the exact commit-SHA image tag.
+4. Render pulls the new image from GHCR.
+5. Render starts the new container.
+6. Render checks `/health`.
+7. Render shifts traffic after the new instance is healthy.
+
+If the GitHub Actions job fails at `Trigger Render deploy`, confirm the `RENDER_DEPLOY_HOOK_URL` repository secret exists and contains the deploy hook URL from the Render service settings.
 
 ### 7. Smoke test production
 
@@ -735,11 +739,10 @@ Guardrails:
 
 1. Confirm external uptime monitor is live and capture screenshot or link.
 2. Confirm Render health check path is `/health`.
-3. Confirm the deployment mode: GitHub source deploy or GHCR image deploy.
-4. Add a deploy hook if GHCR image deploys need to be automatic.
-5. Record the walkthrough video.
-6. Consider deriving version from Git SHA instead of hardcoding `1.0.0`.
-7. Add request-level logs if this becomes more than a prototype.
+3. Confirm the `RENDER_DEPLOY_HOOK_URL` GitHub Actions secret is configured.
+4. Record the walkthrough video.
+5. Consider deriving version from Git SHA instead of hardcoding `1.0.0`.
+6. Add request-level logs if this becomes more than a prototype.
 
 ## Quick Reference
 
