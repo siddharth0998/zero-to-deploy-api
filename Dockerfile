@@ -25,5 +25,5 @@ RUN chown -R myuser:myuser /app
 USER myuser
 
 EXPOSE 8000
-# Call uvicorn directly (it's now in the standard path)
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Render sets PORT for web services; default to 8000 for local Docker runs.
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

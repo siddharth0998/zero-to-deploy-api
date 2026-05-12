@@ -1,0 +1,12 @@
+.DS_Store
+.git
+.github
+.pytest_cache
+.ruff_cache
+__pycache__
+*.pyc
+.venv
+env
+tests
+README.md
+RUNBOOK.md
