@@ -1,22 +1,29 @@
 # Stage 1: Build
-FROM python:3.11-slim as builder
+FROM python:3.11-slim AS builder
 WORKDIR /build
 COPY requirements.txt .
-RUN pip install --user --no-cache-dir -r requirements.txt
+# Install to /install instead of /root/.local
+RUN pip install --prefix=/install --no-cache-dir -r requirements.txt
 
 # Stage 2: Runtime
-FROM python:3.11-slim as runner
+FROM python:3.11-slim AS runner
 WORKDIR /app
-# Copy dependencies from builder
-COPY --from=builder /root/.local /root/.local
-ENV PATH=/root/.local/bin:$PATH
+
+# Create the user FIRST
+RUN useradd -m myuser
+
+# Copy dependencies from builder to a neutral location
+COPY --from=builder /install /usr/local
 
 # Copy app code
 COPY ./app ./app
 
-# Security: Don't run as root
-RUN useradd -m myuser
+# Fix ownership so myuser owns the app files
+RUN chown -R myuser:myuser /app
+
+# Switch to the limited user
 USER myuser
 
 EXPOSE 8000
+# Call uvicorn directly (it's now in the standard path)
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
