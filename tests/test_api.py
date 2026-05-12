@@ -37,3 +37,10 @@ def test_health_endpoint_reports_environment(monkeypatch):
         "version": "1.0.1",
         "environment": "test",
     }
+
+
+def test_health_endpoint_accepts_head_requests():
+    response = client.head("/health")
+
+    assert response.status_code == 200
+    assert response.text == ""

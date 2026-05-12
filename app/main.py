@@ -1,7 +1,7 @@
 import logging
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 
 # 1. Setup Structured Logging
 logging.basicConfig(
@@ -28,4 +28,13 @@ def get_data():
 # 3. The "Production" Health Check
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "version": "1.0.1", "environment": os.getenv("ENV", "dev")}
+    return {
+        "status": "healthy",
+        "version": "1.0.1",
+        "environment": os.getenv("ENV", "dev"),
+    }
+
+
+@app.head("/health", include_in_schema=False)
+def health_check_head():
+    return Response(status_code=200)

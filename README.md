@@ -156,6 +156,7 @@ Health check contract:
 - `status` should be `healthy` for normal operation.
 - `version` should change when the deployed application version changes.
 - `environment` is read from the `ENV` environment variable and defaults to `dev`.
+- `HEAD /health` is also supported because some uptime monitors use HEAD probes.
 
 ## Local Development
 

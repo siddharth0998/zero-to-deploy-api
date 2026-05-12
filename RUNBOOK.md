@@ -66,6 +66,7 @@ Healthy criteria:
 - HTTP status is `200`.
 - JSON response contains `"status": "healthy"`.
 - Response arrives within the monitor timeout.
+- `HEAD /health` also returns `200` for uptime monitors that use HEAD probes.
 
 Unhealthy criteria:
 
