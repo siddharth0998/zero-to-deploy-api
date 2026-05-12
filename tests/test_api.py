@@ -34,6 +34,6 @@ def test_health_endpoint_reports_environment(monkeypatch):
     assert response.status_code == 200
     assert response.json() == {
         "status": "healthy",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "environment": "test",
     }

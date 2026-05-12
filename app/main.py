@@ -28,4 +28,4 @@ def get_data():
 # 3. The "Production" Health Check
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "version": "1.0.0", "environment": os.getenv("ENV", "dev")}
+    return {"status": "healthy", "version": "1.0.1", "environment": os.getenv("ENV", "dev")}
