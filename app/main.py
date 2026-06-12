@@ -30,7 +30,7 @@ def get_data():
 def health_check():
     return {
         "status": "healthy",
-        "version": "1.0.0",
+        "version": "1.1.1",
         "environment": os.getenv("ENV", "dev"),
     }
 
